@@ -1,9 +1,11 @@
 FROM mrismanaziz/man-userbot:buster
 
-RUN git clone -b Man-Userbot https://github.com/mrismanaziz/Man-Userbot /home/man-userbot/ \
-    && chmod 777 /home/man-userbot \
-    && mkdir /home/man-userbot/bin/
-
 WORKDIR /home/man-userbot/
 
-CMD [ "bash", "start" ]
+# Use this repository's source instead of cloning the upstream repository.
+RUN rm -rf /home/man-userbot && mkdir -p /home/man-userbot
+COPY . /home/man-userbot/
+
+RUN chmod +x start && mkdir -p bin
+
+CMD ["python3", "-m", "userbot"]
