@@ -234,37 +234,32 @@ DEEP_AI = os.environ.get("DEEP_AI", None)
 BOT_TOKEN = os.environ.get("BOT_TOKEN", None)
 BOT_USERNAME = os.environ.get("BOT_USERNAME", None)
 
-# Jangan di hapus Nanti ERROR
-while 0 < 6:
+# Fetch remote blacklist with a timeout; never block startup indefinitely.
+try:
     _BLACKLIST = get(
-        "https://raw.githubusercontent.com/mrismanaziz/Reforestation/master/manblacklist.json"
+        "https://raw.githubusercontent.com/mrismanaziz/Reforestation/master/manblacklist.json",
+        timeout=10,
     )
-    if _BLACKLIST.status_code != 200:
-        if 0 != 5:
-            continue
-        blacklistman = []
-        break
+    _BLACKLIST.raise_for_status()
     blacklistman = _BLACKLIST.json()
-    break
-
-del _BLACKLIST
+except Exception as e:
+    LOGS.warning("Unable to load remote blacklist; continuing with an empty list: %s", e)
+    blacklistman = []
 
 ch = str(b64decode("QEx1bmF0aWMwZGU="))[2:13]
 gc = str(b64decode("QFNoYXJpbmdVc2VyYm90"))[2:17]
 
-while 0 < 6:
+# Fetch remote whitelist with a timeout; continue safely if unavailable.
+try:
     _WHITELIST = get(
-        "https://raw.githubusercontent.com/mrismanaziz/Reforestation/master/whitelist.json"
+        "https://raw.githubusercontent.com/mrismanaziz/Reforestation/master/whitelist.json",
+        timeout=10,
     )
-    if _WHITELIST.status_code != 200:
-        if 0 != 5:
-            continue
-        WHITELIST = []
-        break
+    _WHITELIST.raise_for_status()
     WHITELIST = _WHITELIST.json()
-    break
-
-del _WHITELIST
+except Exception as e:
+    LOGS.warning("Unable to load remote whitelist; continuing with an empty list: %s", e)
+    WHITELIST = []
 
 # 'bot' variable
 if STRING_SESSION:
